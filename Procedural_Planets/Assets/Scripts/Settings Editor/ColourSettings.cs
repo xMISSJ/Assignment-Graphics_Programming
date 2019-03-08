@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu()]
-public class ColorSettings : ScriptableObject
+public class ColourSettings : ScriptableObject
 {
 
 	public Color planetColour;

@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class TerrainFace
 {
+	private ShapeGenerator shapeGenerator;
 
 	private Mesh mesh;
 	private int resolution;         // Amount of details regarding the mesh.
@@ -13,8 +14,9 @@ public class TerrainFace
 	private Vector3 axisA;
 	private Vector3 axisB;
 
-	public TerrainFace(Mesh mesh, int resolution, Vector3 localUp)
+	public TerrainFace(ShapeGenerator shapeGenerator, Mesh mesh, int resolution, Vector3 localUp)
 	{
+		this.shapeGenerator = shapeGenerator;
 		this.mesh = mesh;
 		this.resolution = resolution;
 		this.localUp = localUp;
@@ -51,7 +53,7 @@ public class TerrainFace
 
 				// In order to create a sphere, you want all the vertices to be the same distance away from the centre.
 				Vector3 pointOnUnitSphere = pointOnUnitCube.normalized;
-				vertices[i] = pointOnUnitSphere;
+				vertices[i] = shapeGenerator.CalculatePointOnPlanet(pointOnUnitSphere);
 
 				// We can create triangles, so long the triangles aren't the right edge or bottom edge.
 				if (x != resolution - 1 && y != resolution - 1)
