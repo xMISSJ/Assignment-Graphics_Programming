@@ -9,9 +9,14 @@ public class Planet : MonoBehaviour
 	// Max is 256, because 256 squared is about the maxium amount vertices a mesh can have.
 	[Range(2, 256)]
 	public int resolution = 10;
+	public bool autoUpdate = true;
 
 	public ShapeSettings shapeSettings;
 	public ColourSettings colourSettings;
+
+	[HideInInspector]
+	public bool shapeSettingsFoldout;
+	public bool colourSettingsFoldout;
 
 	private ShapeGenerator shapeGenerator;
 
@@ -19,12 +24,6 @@ public class Planet : MonoBehaviour
 	[SerializeField, HideInInspector]
 	MeshFilter[] meshFilters;
 	TerrainFace[] terrainFaces;
-
-	// Work in the editor, whenever we update anything.
-	private void OnValidate()
-	{
-		GeneratePlanet();
-	}
 
 	private void Initialize()
 	{
@@ -68,15 +67,21 @@ public class Planet : MonoBehaviour
 	// If only the shape settings have changed, call this method.
 	public void OnShapeSettingsUpdated()
 	{
-		Initialize();
-		GenerateMesh();
+		if (autoUpdate)
+		{
+			Initialize();
+			GenerateMesh();
+		}
 	}
 
 	// If only the colour settings have changed, call this method.
 	public void OnColourSettingsUpdated()
 	{
-		Initialize();
-		GenerateColours();
+		if (autoUpdate)
+		{
+			Initialize();
+			GenerateColours();
+		}
 	}
 
 
