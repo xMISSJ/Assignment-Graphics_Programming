@@ -14,6 +14,8 @@ public class ShapeSettings : ScriptableObject
 	{
 		// Toggle the visibility of a single noise layer.
 		public bool enabled = true;
+		// Whether or not the first layer should be used as a mask.
+		public bool useFirstLayerAsMask;
 		public NoiseSettings noiseSettings;
 	}
 }
