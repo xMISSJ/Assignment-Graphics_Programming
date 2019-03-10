@@ -7,8 +7,11 @@ using UnityEngine;
 public class Planet : MonoBehaviour
 {
 	// Max is 256, because 256 squared is about the maxium amount vertices a mesh can have.
-	[Range(2, 256)]
-	public int resolution = 10;
+	// In this case 241, because of our i-factor is 8.
+	[Range(2, 241)]
+	public int resolution = 241;
+	[Range(0, 6)]
+	public int levelOfDetail;
 	public bool autoUpdate = true;
 	public enum FaceRenderMask { All, Top, Bottom, Left, Right, Front, Back };
 	public FaceRenderMask faceRenderMask;
