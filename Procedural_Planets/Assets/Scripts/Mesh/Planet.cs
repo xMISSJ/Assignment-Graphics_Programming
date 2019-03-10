@@ -52,10 +52,12 @@ public class Planet : MonoBehaviour
 				meshObject.transform.parent = transform;
 
 				// Default material.
-				meshObject.AddComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Standard"));
+				meshObject.AddComponent<MeshRenderer>();
 				meshFilters[i] = meshObject.AddComponent<MeshFilter>();
 				meshFilters[i].sharedMesh = new Mesh();
 			}
+			// Materials are assigned to each of the meshes.
+			meshFilters[i].GetComponent<MeshRenderer>().sharedMaterial = colourSettings.planetMaterial;
 
 			terrainFaces[i] = new TerrainFace(shapeGenerator, meshFilters[i].sharedMesh, resolution, directions[i]);
 			// Is true if the faceRenderMask is equal to all.
