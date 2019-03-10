@@ -7,9 +7,8 @@ using UnityEngine;
 public class Planet : MonoBehaviour
 {
 	// Max is 256, because 256 squared is about the maxium amount vertices a mesh can have.
-	// In this case 241, because of our i-factor is 8.
-	[Range(2, 241)]
-	public int resolution = 241;
+	[Range(2, 256)]
+	public int resolution = 256;
 	[Range(0, 6)]
 	public int levelOfDetail;
 	public bool autoUpdate = true;
@@ -23,7 +22,8 @@ public class Planet : MonoBehaviour
 	public bool shapeSettingsFoldout;
 	public bool colourSettingsFoldout;
 
-	private ShapeGenerator shapeGenerator;
+	private ShapeGenerator shapeGenerator = new ShapeGenerator();
+	private ColourGenerator colourGenerator = new ColourGenerator();
 
 	// Save these, but hide them.
 	[SerializeField, HideInInspector]
@@ -32,7 +32,8 @@ public class Planet : MonoBehaviour
 
 	private void Initialize()
 	{
-		shapeGenerator = new ShapeGenerator(shapeSettings);
+		shapeGenerator.UpdateSettings(shapeSettings);
+		colourGenerator.UpdateSettings(colourSettings);
 
 		if (meshFilters == null || meshFilters.Length == 0)
 		{
@@ -105,6 +106,7 @@ public class Planet : MonoBehaviour
 				terrainFaces[i].ConstructMesh();
 			}
 		}
+		colourGenerator.UpdateElevation(shapeGenerator.elevationMinMax);
 	}
 
 	void GenerateColours()
@@ -112,7 +114,7 @@ public class Planet : MonoBehaviour
 		// Loop through meshes and set material's colour to the colour in our settings.
 		foreach (MeshFilter mesh in meshFilters)
 		{
-			mesh.GetComponent<MeshRenderer>().sharedMaterial.color = colourSettings.planetColour;
+			colourGenerator.UpdateColours();
 		}
 	}
 

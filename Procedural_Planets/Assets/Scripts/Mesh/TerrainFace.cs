@@ -9,7 +9,7 @@ public class TerrainFace
 	private ShapeGenerator shapeGenerator;
 
 	private Mesh mesh;
-	private int resolution = 241;			   // Amount of details regarding the mesh (256 is max).
+	private int resolution = 256;			   // Amount of details regarding the mesh (256 is max).
 	private Vector3 localUp;				   // Direction the mesh will be facing.
 	private Vector3 axisA;
 	private Vector3 axisB;
