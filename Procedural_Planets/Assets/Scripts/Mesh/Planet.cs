@@ -8,9 +8,7 @@ public class Planet : MonoBehaviour
 {
 	// Max is 256, because 256 squared is about the maxium amount vertices a mesh can have.
 	[Range(2, 256)]
-	public int resolution = 256;
-	[Range(0, 6)]
-	public int levelOfDetail;
+	public int resolution = 10;
 	public bool autoUpdate = true;
 	public enum FaceRenderMask { All, Top, Bottom, Left, Right, Front, Back };
 	public FaceRenderMask faceRenderMask;
@@ -20,10 +18,11 @@ public class Planet : MonoBehaviour
 
 	[HideInInspector]
 	public bool shapeSettingsFoldout;
+	[HideInInspector]
 	public bool colourSettingsFoldout;
 
-	private ShapeGenerator shapeGenerator = new ShapeGenerator();
-	private ColourGenerator colourGenerator = new ColourGenerator();
+	ShapeGenerator shapeGenerator = new ShapeGenerator();
+	ColourGenerator colourGenerator = new ColourGenerator();
 
 	// Save these, but hide them.
 	[SerializeField, HideInInspector]
@@ -96,7 +95,6 @@ public class Planet : MonoBehaviour
 		}
 	}
 
-
 	private void GenerateMesh()
 	{
 		for (int i = 0; i < 6; i++)
@@ -111,11 +109,13 @@ public class Planet : MonoBehaviour
 
 	void GenerateColours()
 	{
-		// Loop through meshes and set material's colour to the colour in our settings.
-		foreach (MeshFilter mesh in meshFilters)
+		colourGenerator.UpdateColours();
+		for (int i = 0; i < 6; i++)
 		{
-			colourGenerator.UpdateColours();
+			if (meshFilters[i].gameObject.activeSelf)
+			{
+				terrainFaces[i].UpdateUvs(colourGenerator);
+			}
 		}
 	}
-
 }

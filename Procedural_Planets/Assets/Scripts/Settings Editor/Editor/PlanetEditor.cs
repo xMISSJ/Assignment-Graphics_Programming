@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using UnityEditor;
 using UnityEngine;
-using UnityEditor;
 
 [CustomEditor(typeof(Planet))]
 public class PlanetEditor : Editor
@@ -20,9 +18,7 @@ public class PlanetEditor : Editor
 			{
 				planet.GeneratePlanet();
 			}
-		DrawSettingsEditor(planet.shapeSettings, planet.OnShapeSettingsUpdated, ref planet.shapeSettingsFoldout, ref shapeEditor);
-		DrawSettingsEditor(planet.colourSettings, planet.OnColourSettingsUpdated, ref planet.colourSettingsFoldout, ref colourEditor);
-	}
+		}
 
 		// Button to manually generate a planet.
 		if (GUILayout.Button("Generate Planet"))
@@ -30,9 +26,13 @@ public class PlanetEditor : Editor
 			planet.GeneratePlanet();
 		}
 
-		// Draw editor for shape- and coloursettings.
-		// Ref is used here to modify the value of the reference itself, rather than the object which the reference refers.
-		void DrawSettingsEditor(Object settings, System.Action onSettingsUpdated, ref bool foldout, ref Editor editor)
+		DrawSettingsEditor(planet.shapeSettings, planet.OnShapeSettingsUpdated, ref planet.shapeSettingsFoldout, ref shapeEditor);
+		DrawSettingsEditor(planet.colourSettings, planet.OnColourSettingsUpdated, ref planet.colourSettingsFoldout, ref colourEditor);
+
+	}
+	// Draw editor for shape- and coloursettings.
+	// Ref is used here to modify the value of the reference itself, rather than the object which the reference refers.
+	void DrawSettingsEditor(Object settings, System.Action onSettingsUpdated, ref bool foldout, ref Editor editor)
 	{
 		// Only draw settings object when it's not null.
 		if (settings != null)
@@ -60,7 +60,7 @@ public class PlanetEditor : Editor
 			}
 		}
 	}
-}
+
 
 	private void OnEnable()
 	{
