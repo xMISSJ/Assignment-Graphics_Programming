@@ -14,8 +14,8 @@ public class ColourGenerator
 		if (texture == null || texture.height != settings.biomeColourSettings.biomes.Length)
 		{
 			// Height that corresponds to a number of biomes, so that each row of the texture can store the colours of that biome.
-			texture = new Texture2D(textureResolution, settings.biomeColourSettings.biomes.Length);
-			//texture = new Texture2D(textureResolution, settings.biomeColourSettings.biomes.Length, TextureFormat.RGBA32, false);
+			//texture = new Texture2D(textureResolution, settings.biomeColourSettings.biomes.Length); // Automatic MipMapping.
+			texture = new Texture2D(textureResolution * 2, settings.biomeColourSettings.biomes.Length, TextureFormat.RGBA32, false);
 		}
 		biomeNoiseFilter = NoiseFilterFactory.CreateNoiseFilter(settings.biomeColourSettings.noise);
 	}
@@ -57,10 +57,18 @@ public class ColourGenerator
 		int colourIndex = 0;
 		foreach (var biome in settings.biomeColourSettings.biomes)
 		{
-			for (int i = 0; i < textureResolution; i++)
+			for (int i = 0; i < textureResolution * 2; i++)
 			{
-				// Round result down to float with -1f.
-				Color gradientCol = biome.gradient.Evaluate(i / (textureResolution - 1f));
+				Color gradientCol;
+				if (i < textureResolution)
+				{
+					gradientCol = settings.oceanColour.Evaluate(i / (textureResolution - 1f));
+				}
+				else
+				{
+					// Round result down to float with -1f.
+					gradientCol = biome.gradient.Evaluate((i - textureResolution) / (textureResolution - 1f));
+				}
 				Color tintCol = biome.tint;
 				colours[colourIndex] = gradientCol * (1 - biome.tintPercent) + tintCol * biome.tintPercent;
 				colourIndex++;

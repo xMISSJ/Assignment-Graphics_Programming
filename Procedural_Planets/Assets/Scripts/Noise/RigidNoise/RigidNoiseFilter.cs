@@ -42,7 +42,7 @@ public class RigidNoiseFilter: INoiseFilter
 		}
 
 		// Makes the terrain recede into the base sphere.
-		noiseValue = Mathf.Max(0, noiseValue - settings.minValue);
+		noiseValue = noiseValue - settings.minValue;
 		return noiseValue * settings.strength;
 	}
 }
