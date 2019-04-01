@@ -34,6 +34,7 @@ public class TerrainFace
 		// Resolution is number of vertices along a single edge of the face.
 		// Total resolution is thus squared.
 		Vector3[] vertices = new Vector3[resolution * resolution];
+		Vector2[] uvs = new Vector2[vertices.Length];
 		// UVs array has same length as the vertices array.
 		int[] triangles = new int[(resolution - 1) * (resolution - 1) * 6];
 		int triIndex = 0;
@@ -84,15 +85,15 @@ public class TerrainFace
 		//{
 		//	uvs[i] = new Vector2(vertices[i].x, vertices[i].y);
 		//}
-		//uvs = new Vector2[vertices.Length];
-		//for (int i = 0; i < resolution; i++)
-		//{
-		//    uvs[i * 2 + 1] = new Vector2(((float)i) / (resolution + 1), 0);
-		//    uvs[i * 2] = new Vector2(((float)i) / (resolution + 1), 1);
-		//}
+		uvs = new Vector2[vertices.Length];
+		for (int i = 0; i < resolution; i++)
+		{
+			uvs[i * 2 + 1] = new Vector2(((float)i) / (resolution + 1), 0);
+			uvs[i * 2] = new Vector2(((float)i) / (resolution + 1), 1);
+		}
 
-			// Put it back.
-			mesh.Clear();
+		// Put it back.
+		mesh.Clear();
 			mesh.vertices = vertices;
 			mesh.triangles = triangles;
 			mesh.RecalculateNormals();
