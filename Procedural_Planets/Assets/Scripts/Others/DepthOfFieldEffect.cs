@@ -30,12 +30,12 @@ public class DepthOfFieldEffect : MonoBehaviour
 		}
 
 		RenderTexture coc = RenderTexture.GetTemporary(
-			source.width, source.height, 0,
-			RenderTextureFormat.RHalf, RenderTextureReadWrite.Linear
+		source.width, source.height, 0,
+		RenderTextureFormat.RHalf, RenderTextureReadWrite.Linear
 		);
 
 		Graphics.Blit(source, coc, dofMaterial, circleOfConfusionPass);
-		Graphics.Blit(coc, destination);
+		Graphics.Blit(source, destination, dofMaterial, bokehPass);
 
 		RenderTexture.ReleaseTemporary(coc);
 	}
