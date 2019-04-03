@@ -4,8 +4,8 @@
 	{
 		_Color("Color", Color) = (1,1,1,1)
 		_MainTex("Main Texture", 2D) = "white" {}
-		_MoonTex("Moon Texture", 2D) = "white" {}
-		_MaskTex("Mask", 2D) = "white" {}
+		_MaskTex1("Mask One", 2D) = "white" {}
+		_MaskTex2("Mask Two", 2D) = "white" {}
 	// Ambient light is applied uniformly to all surfaces on the object.
 	[HDR]
 	_AmbientColor("Ambient Color", Color) = (0.4,0.4,0.4,1)
@@ -66,12 +66,12 @@
 			};
 
 			sampler2D _MainTex;
-			sampler2D _MoonTex;
-			sampler2D _MaskTex;
+			sampler2D _MaskTex1;
+			sampler2D _MaskTex2;
 
 			float4 _MainTex_ST;
-			float4 _MoonTex_ST;
-			float4 _MaskTex_ST;
+			float4 _MaskTex1_ST;
+			float4 _MaskTex2_ST;
 
 			v2f vert(appdata v)
 			{
@@ -80,7 +80,7 @@
 				o.worldNormal = UnityObjectToWorldNormal(v.normal);
 				o.viewDir = WorldSpaceViewDir(v.vertex);
 				//o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-				o.uv = TRANSFORM_TEX(v.uv, _MaskTex);
+				o.uv = TRANSFORM_TEX(v.uv, _MaskTex1);
 				// Defined in Autolight.cginc. Assigns the above shadow coordinate
 				// by transforming the vertex from world space to shadow-map space.
 				TRANSFER_SHADOW(o)
@@ -139,13 +139,14 @@
 				float4 rim = rimIntensity * _RimColor;
 
 				float4 sample = tex2D(_MainTex, i.uv);
-				float4 mask = tex2D(_MaskTex, i.uv);
-				float4 moon = tex2D(_MoonTex, i.uv);
+				float4 mask1 = tex2D(_MaskTex1, i.uv);
+				float4 mask2 = tex2D(_MaskTex2, i.uv);
 
 				//sample = sample * moon.r;
-				moon = moon * mask.r;
+				mask1 = mask1 * sample.r;
+				mask2 = mask2 * mask1.r;
 
-				return (moon + light + _AmbientColor + specular + rim) * _Color * sample;
+				return (mask1 + mask2 + light + _AmbientColor + specular + rim) * _Color * sample;
 			}
 			ENDCG
 		}
