@@ -1,4 +1,4 @@
-﻿Shader "Custom/BasicToon"
+﻿Shader "Custom/ToonShader"
 {
 	Properties
 	{
