@@ -54,8 +54,26 @@
 					#pragma vertex VertexProgram
 					#pragma fragment FragmentProgram
 
+					half Weigh(half3 c) {
+							return 1 / (1 + max(max(c.r, c.g), c.b));
+					}
+
 					half4 FragmentProgram(Interpolators i) : SV_Target {
 					float4 o = _MainTex_TexelSize.xyxy * float2(-0.5, 0.5).xxyy;
+
+					half3 s0 = tex2D(_MainTex, i.uv + o.xy).rgb;
+					half3 s1 = tex2D(_MainTex, i.uv + o.zy).rgb;
+					half3 s2 = tex2D(_MainTex, i.uv + o.xw).rgb;
+					half3 s3 = tex2D(_MainTex, i.uv + o.zw).rgb;
+
+					half w0 = Weigh(s0);
+					half w1 = Weigh(s1);
+					half w2 = Weigh(s2);
+					half w3 = Weigh(s3);
+
+					half3 color = s0 * w0 + s1 * w1 + s2 * w2 + s3 * w3;
+					color /= max(w0 + w1 + w2 + s3, 0.00001);
+
 					half coc0 = tex2D(_CoCTex, i.uv + o.xy).r;
 					half coc1 = tex2D(_CoCTex, i.uv + o.zy).r;
 					half coc2 = tex2D(_CoCTex, i.uv + o.xw).r;
@@ -65,7 +83,7 @@
 					half cocMax = max(max(max(coc0, coc1), coc2), coc3);
 					half coc = cocMax >= -cocMin ? cocMax : cocMin;
 
-					return half4(tex2D(_MainTex, i.uv).rgb, coc);
+					return half4(color, coc);
 					}
 			ENDCG
 		}
@@ -150,9 +168,9 @@
 					}
 					bgColor *= 1 / (bgWeight + (bgWeight == 0));
 					fgColor *= 1 / (fgWeight + (fgWeight == 0));
-					half bgfg = min(1, fgWeight);
+					half bgfg = min(1, fgWeight * 3.14159265359 / kernelSampleCount);
 					half3 color = lerp(bgColor, fgColor, bgfg);
-					return half4(color, 1);
+					return half4(color, bgfg);
 					}
 				ENDCG
 		}
@@ -184,8 +202,8 @@
 						half coc = tex2D(_CoCTex, i.uv).r;
 						half4 dof = tex2D(_DoFTex, i.uv);
 
-						half dofStrength = smoothstep(0.1, 1, abs(coc));
-						half3 color = lerp(source.rgb, dof.rgb, dofStrength);
+						half dofStrength = smoothstep(0.1, 1, coc);
+						half3 color = lerp (source.rgb, dof.rgb, dofStrength + dof.a - dofStrength * dof.a);
 						return half4(color, source.a);
 						}
 					ENDCG
