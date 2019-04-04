@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ca352f9112968f346a5754ad11944da3, type: 3}
-  m_Name: New Colour Settings
+  m_Name: Random
   m_EditorClassIdentifier: 
   planetMaterial: {fileID: 2100000, guid: 85a8087afaaf1bd47a314f1ca97b2eb0, type: 2}
   biomeColourSettings:
