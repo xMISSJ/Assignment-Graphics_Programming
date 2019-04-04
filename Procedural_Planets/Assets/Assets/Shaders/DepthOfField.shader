@@ -6,7 +6,7 @@
 	CGINCLUDE
 #include "UnityCG.cginc"
 
-	sampler2D _MainTex, _CameraDepthTexture, _CoCTex;
+	sampler2D _MainTex, _CameraDepthTexture, _CoCTex, _DoFTex;
 	float4 _MainTex_TexelSize;
 	float _BokehRadius, _FocusDistance, _FocusRange;
 
@@ -127,15 +127,31 @@
 							};
 					#endif
 
+					half Weigh(half coc, half radius) {
+					return saturate((coc - radius + 2) / 2);
+					}
+
 					half4 FragmentProgram(Interpolators i) : SV_Target {
-					half3 color = 0;
-					color *= 1.0 / 81;
+					half3 bgColor = 0, fgColor = 0;
+					half bgWeight = 0, fgWeight = 0;
 					for (int k = 0; k < kernelSampleCount; k++) {
 						float2 o = kernel[k] * _BokehRadius;
-						o *= _MainTex_TexelSize.xy * 4;
-						color += tex2D(_MainTex, i.uv + o).rgb;
+						half radius = length(o);
+						o *= _MainTex_TexelSize.xy;
+						half4 s = tex2D(_MainTex, i.uv + o);
+
+						half bgw = Weigh(max(0, s.a), radius);
+						bgColor += s.rgb * bgw;
+						bgWeight += bgw;
+
+						half fgw = Weigh(-s.a, radius);
+						fgColor += s.rgb * fgw;
+						fgWeight += fgw;
 					}
-					color *= 1.0 / kernelSampleCount;
+					bgColor *= 1 / (bgWeight + (bgWeight == 0));
+					fgColor *= 1 / (fgWeight + (fgWeight == 0));
+					half bgfg = min(1, fgWeight);
+					half3 color = lerp(bgColor, fgColor, bgfg);
 					return half4(color, 1);
 					}
 				ENDCG
@@ -154,8 +170,25 @@
 							tex2D(_MainTex, i.uv + o.xw) +
 							tex2D(_MainTex, i.uv + o.zw);
 					return s * 0.25;
-				}
-			ENDCG
+					}
+				ENDCG
+		}
+
+				Pass{ // 4 combinePass
+					CGPROGRAM
+						#pragma vertex VertexProgram
+						#pragma fragment FragmentProgram
+
+						half4 FragmentProgram(Interpolators i) : SV_Target {
+						half4 source = tex2D(_MainTex, i.uv);
+						half coc = tex2D(_CoCTex, i.uv).r;
+						half4 dof = tex2D(_DoFTex, i.uv);
+
+						half dofStrength = smoothstep(0.1, 1, abs(coc));
+						half3 color = lerp(source.rgb, dof.rgb, dofStrength);
+						return half4(color, source.a);
+						}
+					ENDCG
 		}
 	}
 }

@@ -14,6 +14,7 @@ public class DepthOfFieldEffect : MonoBehaviour
 	const int preFilterPass = 1;
 	const int bokehPass = 2;
 	const int postFilterPass = 3;
+	const int combinePass = 4;
 
 	[Range(0.1f, 100f)]
 	public float focusDistance = 10f;
@@ -47,12 +48,13 @@ public class DepthOfFieldEffect : MonoBehaviour
 		RenderTexture dof1 = RenderTexture.GetTemporary(width, height, 0, format);
 
 		dofMaterial.SetTexture("_CoCTex", coc);
+		dofMaterial.SetTexture("_DoFTex", dof0);
 
 		Graphics.Blit(source, coc, dofMaterial, circleOfConfusionPass);
 		Graphics.Blit(source, dof0, dofMaterial, preFilterPass);
 		Graphics.Blit(dof0, dof1, dofMaterial, bokehPass);
 		Graphics.Blit(dof1, dof0, dofMaterial, postFilterPass);
-		Graphics.Blit(dof0, destination);
+		Graphics.Blit(source, destination, dofMaterial, combinePass);
 
 		RenderTexture.ReleaseTemporary(coc);
 		RenderTexture.ReleaseTemporary(dof0);
