@@ -80,7 +80,7 @@ public class TerrainFace
 				}
 			}
 
-		// Generate the UVs.
+		//Generate the UVs.
 		//for (int i = 0; i < vertices.Length; i++)
 		//{
 		//	uvs[i] = new Vector2(vertices[i].x, vertices[i].y);
@@ -92,8 +92,8 @@ public class TerrainFace
 			uvs[i * 2] = new Vector2(((float)i) / (resolution + 1), 1);
 		}
 
-		// Put it back.
-		mesh.Clear();
+		//Put it back.
+	   mesh.Clear();
 			mesh.vertices = vertices;
 			mesh.triangles = triangles;
 			mesh.RecalculateNormals();

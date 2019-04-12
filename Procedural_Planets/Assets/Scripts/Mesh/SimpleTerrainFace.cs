@@ -71,16 +71,16 @@ public class SimpleTerrainFace : MonoBehaviour
 		}
 
 		// Generate the UVs.
-		for (int i = 0; i < vertices.Length; i++)
-		{
-			uvs[i] = new Vector2(vertices[i].x, vertices[i].y);
-		}
-		//uvs = new Vector2[vertices.Length];
-		//for (int i = 0; i < resolution; i++)
+		//for (int i = 0; i < vertices.Length; i++)
 		//{
-		//    uvs[i * 2 + 1] = new Vector2(((float)i) / (resolution + 1), 0);
-		//    uvs[i * 2] = new Vector2(((float)i) / (resolution + 1), 1);
+		//	uvs[i] = new Vector2(vertices[i].x, vertices[i].y);
 		//}
+		uvs = new Vector2[vertices.Length];
+		for (int i = 0; i < resolution; i++)
+		{
+			uvs[i * 2 + 1] = new Vector2(((float)i) / (resolution + 1), 0);
+			uvs[i * 2] = new Vector2(((float)i) / (resolution + 1), 1);
+		}
 
 		// Put it back.
 		mesh.Clear();
