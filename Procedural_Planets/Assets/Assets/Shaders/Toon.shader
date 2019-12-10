@@ -6,12 +6,11 @@
 		_MainTex("Main Texture", 2D) = "white" {}
 		_MaskTex1("Mask One", 2D) = "white" {}
 		_MaskTex2("Mask Two", 2D) = "white" {}
-	// Ambient light is applied uniformly to all surfaces on the object.
 	[HDR]
-	_AmbientColor("Ambient Color", Color) = (0.4,0.4,0.4,1)
+	_AmbientColor("Ambient Color", Color) = (0.4,0.4,0.4,1) // Light that make surface colour equally.
 	[HDR]
-	_SpecularColor("Specular Color", Color) = (0.9,0.9,0.9,1)
-		// Controls the size of the specular reflection.
+	_SpecularColor("Specular Color", Color) = (0.9,0.9,0.9,1) // Color of the reflection itself.
+		// Size of the specular reflection.
 		_Glossiness("Glossiness", Float) = 32
 		[HDR]
 		_RimColor("Rim Color", Color) = (1,1,1,1)
@@ -28,8 +27,10 @@
 			// data on the main directional light and ambient light.
 			Tags
 			{
+			// Get lightning data.
 				"LightMode" = "ForwardBase"
 				"PassFlags" = "OnlyDirectional"
+
 				"RenderType" = "Transparent"
 				"Queue" = "Transparent"
 			}
@@ -100,40 +101,48 @@
 
 			float4 frag(v2f i) : SV_Target
 			{
+				// Get normals from object space to world space.
 				float3 normal = normalize(i.worldNormal);
 				float3 viewDir = normalize(i.viewDir);
 
 				// Lighting below is calculated using Blinn-Phong,
-				// with values thresholded to creat the "toon" look.
-				// https://en.wikipedia.org/wiki/Blinn-Phong_shading_model
 
-				// Calculate illumination from directional light.
+				// Calculate illumination and direction of the main directional light.
 				// _WorldSpaceLightPos0 is a vector pointing the OPPOSITE
-				// direction of the main directional light.
+				// 0 = perpendicular, 1 = same parallel direction.
+				// Greater than 90 degrees returns negative value.
 				float NdotL = dot(_WorldSpaceLightPos0, normal);
 
 				// Samples the shadow map, returning a value in the 0...1 range,
-				// where 0 is in the shadow, and 1 is not.
+				// 0 = shadow, 1 = no shadow.
 				float shadow = SHADOW_ATTENUATION(i);
-				// Partition the intensity into light and dark, smoothly interpolated
-				// between the two to avoid a jagged break.
+
+				// More smooth interpolation by using smoothstep.
 				float lightIntensity = smoothstep(0, 0.01, NdotL * shadow);
+
 				// Multiply by the main directional light's intensity and color.
-				float4 light = lightIntensity * _LightColor0;
+				// Changes the outer part color of the object.
+				float4 light = lightIntensity * _LightColor0; 
 
 				// Calculate specular reflection.
+				// Half vector is vector between viewing direction and light source.
 				float3 halfVector = normalize(_WorldSpaceLightPos0 + viewDir);
 				float NdotH = dot(normal, halfVector);
-				// Multiply _Glossiness by itself to allow artist to use smaller
-				// glossiness values in the inspector.
+
+				// Multiply _Glossiness to adjust the size of Glossiness.
 				float specularIntensity = pow(NdotH * lightIntensity, _Glossiness * _Glossiness);
+				// Using smoothstep to toonify.
 				float specularIntensitySmooth = smoothstep(0.005, 0.01, specularIntensity);
 				float4 specular = specularIntensitySmooth * _SpecularColor;
 
 				// Calculate rim lighting.
+				// Rim of an object are surfaces facing away from the camera.
+				// Inversion of normal and view direction.
 				float rimDot = 1 - dot(viewDir, normal);
-				// We only want rim to appear on the lit side of the surface,
-				// so multiply it by NdotL, raised to a power to smoothly blend it.
+
+
+				// Rim appears on the lit side of the surface (directional light).
+				// Pow is used here to scale the rim.
 				float rimIntensity = rimDot * pow(NdotL, _RimThreshold);
 				rimIntensity = smoothstep(_RimAmount - 0.01, _RimAmount + 0.01, rimIntensity);
 				float4 rim = rimIntensity * _RimColor;
